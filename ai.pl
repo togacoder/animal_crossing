@@ -1,27 +1,33 @@
 use strict;
 use warnings;
 use utf8;
-use Socket;
+use IO::Socket;
 
 &main();
 exit;
 
 sub main {
-	my $tcpPortNo = getprotobyname('tcp');
-	socket(SOCKET, PF_INET, SOCK_STREAM, $tcpPortNo) or die("socket() fail:$!\n");
-	my $address = sockaddr_in(4444, inet_aton("10.2.72.184"));
-	connect(SOCKET, $address) or die("connect() fail:$!\n");
-	my $msg = <SOCKET>;
-	chomp $msg;
-	print "$msg\n";
+	print "IP:";
+	my $host = <>; chomp $host;
+	#print "port:";
+	my $port = 4444;
+	my $sock = new IO::Socket::INET(
+		PeerAddr => $host,
+		PeerPort => $port,
+		Proto => 'tcp');
+ 		die "IO::Socket : $!" unless $sock;	
 	
+	my $msg = <$sock>;
+	print "$msg\n";
+		
 	while(1) {
 		my $input = <>;
-		 last if($input =~ m/^q\s*$/);
-		
-		my $msg = <SOCKET>;
+		last if($input eq "exit");
+		print $sock $input;
+		my $msg = <$sock>;
 		print $msg;
 	}
-
+	
+	close($sock);
 	print("bye\n");
 }
