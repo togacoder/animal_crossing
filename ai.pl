@@ -29,12 +29,12 @@ sub board {
 	return (@board);
 }
 sub c_mv {
-	my ($x, $y, $player) = @_;
+	my ($x, $y, $num) = @_;
 	#動ける範囲 $x : $list[$i][0], $y : $list[$i][1] $y
 	my @list1 = ([0, 1]);
 	my @list2 = ([0, -1]);
 	my @ans;
-	if($player eq "Player1") {
+	if($num == 1) {
 		for(my $i = 0; $i <= $#list1; $i++) {
 			#版内に収まるか
 			if((0 <= $y + $list1[$i][1])and($y + $list1[$i][1] < 4)) {
@@ -61,6 +61,7 @@ sub c_mv {
 }
 
 sub g_mv {
+
 }
 sub e_mv {
 }
@@ -70,7 +71,7 @@ sub l_mv {
 }
 sub possible {
 	#駒の添え字はプレイヤー番号
-	my (@board, $player) = @_;
+	my (@board, $num) = @_;
 	#着手可能手のリストをpushしていく ([before], [after])
 	my @possible_list;
 	for(my $i = 0; $i < 4; $i++) {
@@ -78,7 +79,7 @@ sub possible {
 			my @list;
 			if($palyer eq "Player1") {
 				if($board[$i][$j] eq "c1") {
-					@list = &c_mv($j, $i, $player, @board);
+					@list = &c_mv($j, $i, $num, @board);
 					push(@possible_list, @list);
 				} elsif($baord[$i][$j] eq "g1") {
 					
@@ -121,8 +122,8 @@ sub main {
 	print $msg;
 	chomp $msg;
 	$msg =~ s/\D//g;
-	my $player = "Player" . $msg;
-	print "$player\n";
+	my $num = $msg;
+	print "Player" . $num, $/;
 	
 	#初期盤面
 	print $sock "initboard\n";
@@ -136,10 +137,10 @@ sub main {
 	my $mv; #sendするmove message
 	my @board;
 	#初手
-	if(($log[-1] eq "start")and($player eq "Player1")) {
+	if(($log[-1] eq "start")and($num == 1)) {
 		(@board) = &make_board($msg);
 		#着手可能手
-		$mv = &possible(@board, $player);
+		$mv = &possible(@board, $num);
 		$mv = &mv_make($msg);
 	}
 	#2手目以降
