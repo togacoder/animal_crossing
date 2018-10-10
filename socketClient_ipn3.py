@@ -9,7 +9,7 @@ import time
 
 BUFSIZE = 1024
 
-serverName = "10.128.3.109"
+serverName = "localhost"
 serverPort = 4444
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
