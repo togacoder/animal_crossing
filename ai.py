@@ -11,14 +11,17 @@ def which_turn(s, n):
     line = s.recv(BUFSIZE).rstrip().decode()
     print(line)
     num = re.search(r'\d', line)
-    num = num.group(0) 
-    if n == num:
-        return True
-    else:
+    if(num == None):
         return False
+    else:
+        num = num.group(0) 
+        if n == num:
+            return True
+        else:
+            return False
 
 def main():
-    serverName = ""
+    serverName = "localhost"
     serverPort = 4444
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((serverName, serverPort))
