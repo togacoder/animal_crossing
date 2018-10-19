@@ -49,28 +49,51 @@ def can_move(num, board_dict):
     for place, piece in board_dict.items():
         print(place + ": " + piece)
         if piece != '--':
-            lw = list(place)
+            lw = list(place) # lw[0]: A-E, lw[1]: 1-6
             l_list = list()
             w_list = list()
             l_list = lengths(lw[0], lw[1])
             w_list = widths(lw[0])
-            if piece == 'l' + num:
-                for l in l_list:
-                    for w in w_list:
+            for l in l_list:
+                for w in w_list:
+                    if piece == 'l' + num:
                         can_list.append([place, w + l])
+                    elif piece == 'g' + num:
+                        if lw[0] == 'D' or lw[0] == 'E':
+                            can_list.append([place, w + l])
+                        else:
+                            if lw[0] == w or lw[1] == l:
+                                can_list.append([place, w + l])
+                    elif piece == 'e' + num:
+                        if lw[0] == 'D' or lw[0] == 'E':
+                            can_list.append([place, w + l])
+                        else:
+                            if lw[0] != w and lw[1] != l:
+                                can_list.append([place, w + l])
+                    elif piece == 'c' + num:
+                        if lw[0] == 'D' or lw[0] == 'E':
+                            can_list.append([place, l + w])
+                        elif num == '1' and int(l) + 1 == int(lw[1]) and w == lw[0]:
+                            can_list.append([place, w + l])
+                        elif num == '2' and int(l) - 1 == int(lw[1]) and w == lw[0]:
+                            can_list.append([place, w + l])
+                    elif piece == 'h' + num:
+                        if num == '1' and lw[0] != w and int(lw[1]) != int(l) - 1:
+                            can_list.append([place, w + l])
+                        elif num == '2' and lw[0] != w and int(lw[1]) != int(l) + 1:
+                            can_list.append([place, w + l])
 
-    board_can = chech_mv(can_list, board_dict)
+    board_can = check_mv(can_list, board_dict)
 
     print('board_can')
     print(board_can)
     return board_can
 
-def chech_mv(c_list, b_dict):
+def check_mv(c_list, b_dict):
     board_can = list()
     for mv in c_list:
         v0 = re.search('\d', b_dict[mv[0]])[0]
         v1 = re.search('\d', b_dict[mv[1]])
-
         if v1 != None:
             v1 = v1[0]
         else:
@@ -112,6 +135,7 @@ def widths(width):
 def main():
     board_dict = dict()
     board_can = list()
+    enemyNum = ''
 
     # You are Player(1 or 2).
     playerNum = s.recv(BUFSIZE).rstrip().decode()
@@ -119,6 +143,11 @@ def main():
     playerNum = re.search(r'\d', playerNum)
     playerNum = playerNum.group(0)
     print(playerNum)
+
+    if playerNum == 1:
+        enemyNum = 2
+    else:
+        enemyNum = 1
 
     while True:
         while True:
