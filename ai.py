@@ -2,6 +2,7 @@
 import socket
 import re
 import time
+import random
 
 BUFSIZE = 1024
 
@@ -47,7 +48,6 @@ def can_move(num, board_dict):
     board_can = list() 
     # 動かせる駒はnumと同じ駒
     for place, piece in board_dict.items():
-        print(place + ": " + piece)
         if piece != '--':
             lw = list(place) # lw[0]: A-E, lw[1]: 1-6
             l_list = list()
@@ -72,17 +72,19 @@ def can_move(num, board_dict):
                                 can_list.append([place, w + l])
                     elif piece == 'c' + num:
                         if lw[0] == 'D' or lw[0] == 'E':
-                            can_list.append([place, l + w])
+                            can_list.append([place, w + l])
                         elif num == '1' and int(l) + 1 == int(lw[1]) and w == lw[0]:
                             can_list.append([place, w + l])
                         elif num == '2' and int(l) - 1 == int(lw[1]) and w == lw[0]:
                             can_list.append([place, w + l])
                     elif piece == 'h' + num:
-                        if num == '1' and lw[0] != w and int(lw[1]) != int(l) - 1:
+                        if num == '1' and lw[0] == w or int(lw[1]) == int(l) or lw[0] != w and int(lw[1]) == int(l) + 1:
                             can_list.append([place, w + l])
-                        elif num == '2' and lw[0] != w and int(lw[1]) != int(l) + 1:
+                        elif num == '2' and lw[0] == w and int(lw[1]) == int(l) or lw[0] != w and int(lw[1]) == int(l) - 1:
                             can_list.append([place, w + l])
 
+    for i in can_list:
+        print(i)
     board_can = check_mv(can_list, board_dict)
 
     print('board_can')
@@ -132,6 +134,19 @@ def widths(width):
 
     return width_list
     
+def mv_search(board_can, board_dict, e_player):
+    mv_com = ''
+    num = random.randrange(len(board_can))
+    for i in range(num):
+        if board_can[i][1] == 'l' + str(e_player):
+            mv_com = 'mv ' + board_can[i][0] + ' ' + board_can[i][1]
+            break
+    
+    if mv_com == '':
+        mv_com = 'mv ' + board_can[num][0] + ' ' + board_can[num][1] 
+
+    return mv_com
+
 def main():
     board_dict = dict()
     board_can = list()
@@ -158,12 +173,16 @@ def main():
 
         # 盤面を読み取る
         board_dict = get_board()
-        print('baord_dict')
+        print('board_dict')
         print(board_dict)
         # 打てる手を探す
-        can_move(playerNum, board_dict) 
-
-        line = input("")
+        board_can = can_move(playerNum, board_dict) 
+        
+        # 手を選ぶ
+        mv_com = mv_search(board_can, board_dict, enemyNum) 
+        print(mv_com)
+        line = mv_com
+        # line = input("")
 
         if re.match(r"^q*$", line):
             break
